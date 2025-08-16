@@ -11,7 +11,7 @@ const sharp = require('sharp'); // High-performance image processing library
 
 // --- Initialization ---
 const app = express();
-const port = 3000; // The port the server will run on
+const port = process.env.PORT || 3000; // The port the server will run on
 
 // --- Environment Variables ---
 // IMPORTANT: Store your API key in an environment variable for security.
