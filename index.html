@@ -155,7 +155,7 @@
             formData.append('image_file', file);
 
             try {
-                const backendUrl = 'http://localhost:3000/process-image';
+                const backendUrl = 'https://desova-editor.onrender.com/process-image';
                 const response = await fetch(backendUrl, { method: 'POST', body: formData });
 
                 if (!response.ok) {
