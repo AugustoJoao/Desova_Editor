@@ -57,14 +57,6 @@
                         </label>
                     </div> 
                 </div>
-
-                <!-- Process Button -->
-                <div class="text-center mb-6">
-                    <button id="processButton" class="inline-flex items-center justify-center w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg shadow-md hover:shadow-lg transition-transform transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
-                        Processar Imagem
-                    </button>
-                </div>
             </div>
 
             <!-- Loading and Message Display -->
@@ -76,19 +68,29 @@
 
             <!-- Image Preview Section (Visible after upload) -->
             <div id="preview-section" class="hidden">
-                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mb-8">
+                 <div id="preview-grid" class="grid grid-cols-1 justify-items-center gap-6 md:gap-8 mb-8">
                     <div class="text-center">
                         <h2 class="text-xl font-semibold mb-4">Imagem Original</h2>
                         <div class="w-full h-64 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
                             <img id="originalImage" src="https://placehold.co/400x400/e2e8f0/cbd5e0?text=Enviar+Imagem" alt="Original" class="max-w-full max-h-full object-contain">
                         </div>
                     </div>
-                    <div class="text-center md:col-span-2">
-                        <h2 class="text-xl font-semibold mb-4">Imagem Pronta para Editar</h2>
+                    <div id="processed-image-wrapper" class="text-center hidden">
+                        <h2 class="text-xl font-semibold mb-4">Imagem Processada</h2>
                         <div class="w-full h-64 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
                             <img id="processedImage" src="https://placehold.co/400x400/e2e8f0/cbd5e0?text=Resultado" alt="Processada" class="max-w-full max-h-full object-contain">
                         </div>
                     </div>
+                </div>
+                <div id="preview-buttons" class="text-center mb-6 flex flex-wrap justify-center gap-4">
+                    <button id="processButton" class="inline-flex items-center justify-center w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg shadow-md hover:shadow-lg transition-transform transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+                        Processar Imagem
+                    </button>
+                     <button id="removeButton" class="inline-flex items-center justify-center w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-lg shadow-md hover:shadow-lg transition-transform transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-red-300">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        Remover Imagem
+                    </button>
                 </div>
             </div>
 
@@ -114,45 +116,95 @@
     
     <script>
         // --- CONFIGURATION ---
-        // This is your live backend URL from Render.
         const BACKEND_BASE_URL = 'https://desova-editor.onrender.com'; 
-        // For local development, use: const BACKEND_BASE_URL = 'http://localhost:3000';
 
         // DOM element references
         const fileInput = document.getElementById('fileInput');
+        const fileLabel = document.querySelector('label[for="fileInput"]');
+        const uploadSection = document.getElementById('upload-section');
         const processButton = document.getElementById('processButton');
+        const removeButton = document.getElementById('removeButton');
         const originalImage = document.getElementById('originalImage');
         const processedImage = document.getElementById('processedImage');
         const loading = document.getElementById('loading');
         const message = document.getElementById('message');
         const previewSection = document.getElementById('preview-section');
+        const previewGrid = document.getElementById('preview-grid');
+        const processedImageWrapper = document.getElementById('processed-image-wrapper');
+        const previewButtons = document.getElementById('preview-buttons');
         const editorSection = document.getElementById('editor-section');
         const downloadFinalButton = document.getElementById('downloadFinalButton');
 
-        let imageEditor; // Variable to hold the TUI Image Editor instance
+        let imageEditor;
+        let currentFile = null;
 
-        // Instantly displays the selected image in the "Original Image" preview box.
-        fileInput.addEventListener('change', () => {
-            const file = fileInput.files[0];
-            if (file) {
+        // --- File Handling ---
+        function handleFile(file) {
+            if (file && file.type.startsWith('image/')) {
+                currentFile = file;
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     originalImage.src = e.target.result;
                 };
                 reader.readAsDataURL(file);
                 
-                // Show the preview section
+                uploadSection.classList.add('hidden');
                 previewSection.classList.remove('hidden');
-                processedImage.src = 'https://placehold.co/400x400/e2e8f0/cbd5e0?text=Aguardando Processamento';
                 message.classList.add('hidden');
                 editorSection.classList.add('hidden');
+            } else {
+                showMessage('Por favor, selecione um arquivo de imagem válido (PNG, JPG, WEBP).', 'error');
             }
+        }
+        
+        function resetUI() {
+            currentFile = null;
+            fileInput.value = ''; // Reset file input
+            originalImage.src = 'https://placehold.co/400x400/e2e8f0/cbd5e0?text=Enviar+Imagem';
+            
+            uploadSection.classList.remove('hidden');
+            previewSection.classList.add('hidden');
+            editorSection.classList.add('hidden');
+            message.classList.add('hidden');
+            processedImageWrapper.classList.add('hidden');
+            previewGrid.classList.remove('md:grid-cols-2');
+            previewGrid.classList.add('md:grid-cols-1');
+            previewButtons.classList.remove('hidden');
+        }
+
+        fileInput.addEventListener('change', (e) => {
+            handleFile(e.target.files[0]);
         });
 
-        // Step 1: Process the image on button click
+        removeButton.addEventListener('click', resetUI);
+
+        // --- Drag and Drop Event Listeners ---
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            fileLabel.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            }, false);
+        });
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            fileLabel.addEventListener(eventName, () => {
+                fileLabel.classList.add('bg-blue-100', 'border-blue-500');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            fileLabel.addEventListener(eventName, () => {
+                fileLabel.classList.remove('bg-blue-100', 'border-blue-500');
+            }, false);
+        });
+
+        fileLabel.addEventListener('drop', (e) => {
+            handleFile(e.dataTransfer.files[0]);
+        }, false);
+
+        // Step 1: Process the image
         processButton.addEventListener('click', async () => {
-            const file = fileInput.files[0];
-            if (!file) {
+            if (!currentFile) {
                 showMessage('Por favor, selecione um arquivo de imagem.', 'error');
                 return;
             }
@@ -160,10 +212,14 @@
             loading.classList.remove('hidden');
             message.classList.add('hidden');
             processedImage.src = 'https://placehold.co/400x400/e2e8f0/cbd5e0?text=Processando...';
+            processedImageWrapper.classList.remove('hidden');
+            previewGrid.classList.remove('md:grid-cols-1');
+            previewGrid.classList.add('md:grid-cols-2');
             processButton.disabled = true;
+            removeButton.disabled = true;
 
             const formData = new FormData();
-            formData.append('image_file', file);
+            formData.append('image_file', currentFile);
 
             try {
                 const response = await fetch(`${BACKEND_BASE_URL}/process-image`, { method: 'POST', body: formData });
@@ -179,8 +235,7 @@
                 processedImage.src = objectURL;
                 showMessage('Imagem processada com sucesso! Você pode fazer mais edições abaixo.', 'success');
                 
-                // Hide the initial upload button and show the editor
-                document.getElementById('upload-section').classList.add('hidden');
+                previewButtons.classList.add('hidden');
                 editorSection.classList.remove('hidden');
 
                 if (imageEditor) {
@@ -206,10 +261,11 @@
             } finally {
                 loading.classList.add('hidden');
                 processButton.disabled = false;
+                removeButton.disabled = false;
             }
         });
 
-        // Step 2: Download the final image after TUI edits
+        // Step 2: Download the final image
         downloadFinalButton.addEventListener('click', async () => {
             if (!imageEditor) return;
 
@@ -234,7 +290,6 @@
                 const finalBlob = await response.blob();
                 const objectURL = URL.createObjectURL(finalBlob);
 
-                // Create a temporary link to trigger the download
                 const tempLink = document.createElement('a');
                 tempLink.href = objectURL;
                 tempLink.download = 'imagem-final-com-pixels.png';
