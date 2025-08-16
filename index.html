@@ -74,8 +74,8 @@
             </div>
             <div id="message" class="hidden text-center my-4 p-4 rounded-lg"></div>
 
-            <!-- Image Display and Editor Section -->
-            <div id="editor-section" class="hidden">
+            <!-- Image Preview Section (Visible after upload) -->
+            <div id="preview-section" class="hidden">
                  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mb-8">
                     <div class="text-center">
                         <h2 class="text-xl font-semibold mb-4">Imagem Original</h2>
@@ -90,7 +90,10 @@
                         </div>
                     </div>
                 </div>
+            </div>
 
+            <!-- TUI Editor Section (Visible after processing) -->
+            <div id="editor-section" class="hidden">
                 <h2 class="text-2xl font-bold text-center mb-4">Continue Editando</h2>
                 <div id="tui-image-editor-container"></div>
                 <div class="text-center mt-6">
@@ -122,6 +125,7 @@
         const processedImage = document.getElementById('processedImage');
         const loading = document.getElementById('loading');
         const message = document.getElementById('message');
+        const previewSection = document.getElementById('preview-section');
         const editorSection = document.getElementById('editor-section');
         const downloadFinalButton = document.getElementById('downloadFinalButton');
 
@@ -136,7 +140,10 @@
                     originalImage.src = e.target.result;
                 };
                 reader.readAsDataURL(file);
-                processedImage.src = 'https://placehold.co/400x400/e2e8f0/cbd5e0?text=Resultado';
+                
+                // Show the preview section
+                previewSection.classList.remove('hidden');
+                processedImage.src = 'https://placehold.co/400x400/e2e8f0/cbd5e0?text=Aguardando Processamento';
                 message.classList.add('hidden');
                 editorSection.classList.add('hidden');
             }
@@ -171,6 +178,9 @@
                 
                 processedImage.src = objectURL;
                 showMessage('Imagem processada com sucesso! Você pode fazer mais edições abaixo.', 'success');
+                
+                // Hide the initial upload button and show the editor
+                document.getElementById('upload-section').classList.add('hidden');
                 editorSection.classList.remove('hidden');
 
                 if (imageEditor) {
