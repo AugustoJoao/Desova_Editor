@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Photoroom Image Editor</title>
+    <title>Desova Editor</title>
     <!-- TUI Image Editor CSS -->
     <link type="text/css" href="https://uicdn.toast.com/tui-color-picker/v2.2.7/tui-color-picker.css" rel="stylesheet">
     <link type="text/css" href="https://uicdn.toast.com/tui-image-editor/v3.15.3/tui-image-editor.css" rel="stylesheet">
@@ -12,58 +12,57 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* Light gray background */
         }
         .spinner {
-            border-top-color: #3498db;
+            border-top-color: #3b82f6; /* Blue-500 */
             animation: spin 1s linear infinite;
         }
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
-        /* Ensure the editor has a defined height */
         #tui-image-editor-container {
             height: 800px;
         }
+        .gradient-bg {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+        .card-shadow {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
     </style>
 </head>
-<body class="bg-gray-100 text-gray-800">
+<body class="gradient-bg">
 
     <div class="container mx-auto p-4 sm:p-6 md:p-8">
-        <header class="text-center mb-8">
-            <h1 class="text-3xl sm:text-4xl font-bold text-gray-900">Photoroom Image Editor</h1>
-            <p class="text-md sm:text-lg text-gray-600 mt-2">Upload an image to remove the background, resize it, and add corner pixels.</p>
+        <header class="text-center mb-12">
+            <h1 class="text-4xl sm:text-5xl font-bold text-gray-800">Desova Editor</h1>
+            <p class="text-lg text-gray-600 mt-4">Envie uma imagem para remover o fundo, redimensionar e finalizar sua arte.</p>
         </header>
 
-        <main class="bg-white rounded-2xl shadow-lg p-6 md:p-8 max-w-7xl mx-auto">
-
+        <main class="bg-white rounded-2xl card-shadow p-6 md:p-8 max-w-7xl mx-auto">
+            
             <div id="upload-section">
-                <!-- Instructions for running the server -->
-                <div id="instructions" class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-6 rounded-lg" role="alert">
-                    <p class="font-bold">Setup Required</p>
-                    <p>This frontend now communicates with a backend server. Please make sure the Node.js server is running on `http://localhost:3000` before processing an image.</p>
-                </div>
-
                 <!-- File Input -->
                 <div class="mb-6">
-                     <label for="fileInput" class="block text-sm font-medium text-gray-700 mb-2">Choose an image:</label>
+                     <label for="fileInput" class="block text-sm font-medium text-gray-700 mb-2">Escolha uma imagem:</label>
                     <div class="flex items-center justify-center w-full">
-                        <label for="fileInput" class="flex flex-col items-center justify-center w-full h-48 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition">
+                        <label for="fileInput" class="flex flex-col items-center justify-center w-full h-48 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-blue-50 hover:border-blue-400 transition-colors duration-300">
                             <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                                <svg class="w-8 h-8 mb-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
-                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
-                                </svg>
-                                <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">Click to upload</span> or drag and drop</p>
-                                <p class="text-xs text-gray-500">PNG, JPG, or WEBP</p>
+                                <svg class="w-10 h-10 mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                                <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">Clique para enviar</span> ou arraste e solte</p>
+                                <p class="text-xs text-gray-500">PNG, JPG ou WEBP</p>
                             </div>
                             <input id="fileInput" type="file" class="hidden" accept="image/png, image/jpeg, image/webp" />
                         </label>
-                    </div>
+                    </div> 
                 </div>
 
                 <!-- Process Button -->
                 <div class="text-center mb-6">
-                    <button id="processButton" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg shadow-md hover:shadow-lg transition-transform transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300">
-                        Process Image
+                    <button id="processButton" class="inline-flex items-center justify-center w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg shadow-md hover:shadow-lg transition-transform transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+                        Processar Imagem
                     </button>
                 </div>
             </div>
@@ -71,7 +70,7 @@
             <!-- Loading and Message Display -->
             <div id="loading" class="hidden text-center my-4">
                 <div class="inline-block spinner w-8 h-8 border-4 rounded-full" role="status"></div>
-                <p class="text-gray-600 mt-2">Processing your image, please wait...</p>
+                <p class="text-gray-600 mt-2">Processando sua imagem, por favor aguarde...</p>
             </div>
             <div id="message" class="hidden text-center my-4 p-4 rounded-lg"></div>
 
@@ -79,24 +78,25 @@
             <div id="editor-section" class="hidden">
                  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mb-8">
                     <div class="text-center">
-                        <h2 class="text-xl font-semibold mb-4">Original Image</h2>
+                        <h2 class="text-xl font-semibold mb-4">Imagem Original</h2>
                         <div class="w-full h-64 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
-                            <img id="originalImage" src="https://placehold.co/400x400/e2e8f0/cbd5e0?text=Upload+Image" alt="Original" class="max-w-full max-h-full object-contain">
+                            <img id="originalImage" src="https://placehold.co/400x400/e2e8f0/cbd5e0?text=Enviar+Imagem" alt="Original" class="max-w-full max-h-full object-contain">
                         </div>
                     </div>
                     <div class="text-center md:col-span-2">
-                        <h2 class="text-xl font-semibold mb-4">Image Ready to Edit</h2>
+                        <h2 class="text-xl font-semibold mb-4">Imagem Pronta para Editar</h2>
                         <div class="w-full h-64 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
-                            <img id="processedImage" src="https://placehold.co/400x400/e2e8f0/cbd5e0?text=Result" alt="Processed" class="max-w-full max-h-full object-contain">
+                            <img id="processedImage" src="https://placehold.co/400x400/e2e8f0/cbd5e0?text=Resultado" alt="Processada" class="max-w-full max-h-full object-contain">
                         </div>
                     </div>
                 </div>
 
-                <h2 class="text-2xl font-bold text-center mb-4">Continue Editing</h2>
+                <h2 class="text-2xl font-bold text-center mb-4">Continue Editando</h2>
                 <div id="tui-image-editor-container"></div>
                 <div class="text-center mt-6">
-                    <button id="downloadFinalButton" class="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg shadow-md hover:shadow-lg transition-transform transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-green-300">
-                        Download Final Image
+                    <button id="downloadFinalButton" class="inline-flex items-center justify-center w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg shadow-md hover:shadow-lg transition-transform transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-green-300">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        Baixar Imagem Final
                     </button>
                 </div>
             </div>
@@ -108,8 +108,13 @@
     <script type="text/javascript" src="https://uicdn.toast.com/tui-code-snippet/v1.5.2/tui-code-snippet.min.js"></script>
     <script type="text/javascript" src="https://uicdn.toast.com/tui-color-picker/v2.2.7/tui-color-picker.min.js"></script>
     <script type="text/javascript" src="https://uicdn.toast.com/tui-image-editor/v3.15.3/tui-image-editor.min.js"></script>
-
+    
     <script>
+        // --- CONFIGURATION ---
+        // This is your live backend URL from Render.
+        const BACKEND_BASE_URL = 'https://desova-editor.onrender.com'; 
+        // For local development, use: const BACKEND_BASE_URL = 'http://localhost:3000';
+
         // DOM element references
         const fileInput = document.getElementById('fileInput');
         const processButton = document.getElementById('processButton');
@@ -117,13 +122,12 @@
         const processedImage = document.getElementById('processedImage');
         const loading = document.getElementById('loading');
         const message = document.getElementById('message');
-        const uploadSection = document.getElementById('upload-section');
         const editorSection = document.getElementById('editor-section');
         const downloadFinalButton = document.getElementById('downloadFinalButton');
 
         let imageEditor; // Variable to hold the TUI Image Editor instance
 
-        // Display the selected image
+        // Instantly displays the selected image in the "Original Image" preview box.
         fileInput.addEventListener('change', () => {
             const file = fileInput.files[0];
             if (file) {
@@ -132,7 +136,7 @@
                     originalImage.src = e.target.result;
                 };
                 reader.readAsDataURL(file);
-                processedImage.src = 'https://placehold.co/400x400/e2e8f0/cbd5e0?text=Result';
+                processedImage.src = 'https://placehold.co/400x400/e2e8f0/cbd5e0?text=Resultado';
                 message.classList.add('hidden');
                 editorSection.classList.add('hidden');
             }
@@ -142,32 +146,31 @@
         processButton.addEventListener('click', async () => {
             const file = fileInput.files[0];
             if (!file) {
-                showMessage('Please select an image file.', 'error');
+                showMessage('Por favor, selecione um arquivo de imagem.', 'error');
                 return;
             }
 
             loading.classList.remove('hidden');
             message.classList.add('hidden');
-            processedImage.src = 'https://placehold.co/400x400/e2e8f0/cbd5e0?text=Processing...';
+            processedImage.src = 'https://placehold.co/400x400/e2e8f0/cbd5e0?text=Processando...';
             processButton.disabled = true;
 
             const formData = new FormData();
             formData.append('image_file', file);
 
             try {
-                const backendUrl = 'https://desova-editor.onrender.com/process-image';
-                const response = await fetch(backendUrl, { method: 'POST', body: formData });
+                const response = await fetch(`${BACKEND_BASE_URL}/process-image`, { method: 'POST', body: formData });
 
                 if (!response.ok) {
                     const errorData = await response.json();
-                    throw new Error(errorData.error || `Server responded with status: ${response.status}`);
+                    throw new Error(errorData.error || `O servidor respondeu com o status: ${response.status}`);
                 }
 
                 const imageBlob = await response.blob();
                 const objectURL = URL.createObjectURL(imageBlob);
-
+                
                 processedImage.src = objectURL;
-                showMessage('Image processed successfully! You can now make further edits below.', 'success');
+                showMessage('Imagem processada com sucesso! Você pode fazer mais edições abaixo.', 'success');
                 editorSection.classList.remove('hidden');
 
                 if (imageEditor) {
@@ -210,13 +213,12 @@
 
                 const formData = new FormData();
                 formData.append('image_file', blob, 'final-image.png');
-
-                const backendUrl = 'http://localhost:3000/add-corner-pixels';
-                const response = await fetch(backendUrl, { method: 'POST', body: formData });
+                
+                const response = await fetch(`${BACKEND_BASE_URL}/add-corner-pixels`, { method: 'POST', body: formData });
 
                 if (!response.ok) {
                     const errorData = await response.json();
-                    throw new Error(errorData.error || `Server responded with status: ${response.status}`);
+                    throw new Error(errorData.error || `O servidor respondeu com o status: ${response.status}`);
                 }
 
                 const finalBlob = await response.blob();
@@ -225,13 +227,13 @@
                 // Create a temporary link to trigger the download
                 const tempLink = document.createElement('a');
                 tempLink.href = objectURL;
-                tempLink.download = 'final-image-with-pixels.png';
+                tempLink.download = 'imagem-final-com-pixels.png';
                 document.body.appendChild(tempLink);
                 tempLink.click();
                 document.body.removeChild(tempLink);
                 URL.revokeObjectURL(objectURL);
 
-                showMessage('Final image downloaded!', 'success');
+                showMessage('Imagem final baixada com sucesso!', 'success');
 
             } catch (error) {
                 handleError(error);
@@ -242,14 +244,14 @@
         });
 
         function handleError(error) {
-            console.error('Error:', error);
+            console.error('Erro:', error);
             if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-                const serverErrorMessage = 'Error: Could not connect to the backend server. Please ensure it is running and accessible at http://localhost:3000.';
+                const serverErrorMessage = `Erro: Não foi possível conectar ao servidor. Por favor, verifique se ele está rodando e acessível em ${BACKEND_BASE_URL}.`;
                 showMessage(serverErrorMessage, 'error');
             } else {
-                showMessage(`An error occurred: ${error.message}`, 'error');
+                showMessage(`Ocorreu um erro: ${error.message}`, 'error');
             }
-            processedImage.src = 'https://placehold.co/400x400/f87171/ffffff?text=Error';
+            processedImage.src = 'https://placehold.co/400x400/f87171/ffffff?text=Erro';
         }
 
         function showMessage(text, type) {
